@@ -147,6 +147,20 @@ function aeapi_civicrm_entityTypes(&$entityTypes) {
   _aeapi_civix_civicrm_entityTypes($entityTypes);
 }
 
+/**
+ * Define custom (Drupal) permissions
+ */
+function aeapi_civicrm_permission(&$permissions) {
+  $permissions['access AE Contact API'] = 'API: Access AEContact API';
+}
+
+/**
+ * Set permissions for runner/engine API call
+ */
+function aeapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
+  $permissions['a_e_contact']['submit'] = array('access AE Contact API');
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
