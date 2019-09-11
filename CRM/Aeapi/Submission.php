@@ -72,14 +72,27 @@ class CRM_Aeapi_Submission {
       }
     }
 
-    // Pass to XCM.
-    $contact_data['contact_type'] = $contact_type;
-    $contact = civicrm_api3('Contact', 'getorcreate', $contact_data);
-    if (empty($contact['id'])) {
-      return NULL;
+    $manager = CRM_Extension_System::singleton()->getManager();
+    if ($manager->getStatus('de.systopia.xcm') === CRM_Extension_Manager::STATUS_INSTALLED) {
+      // XCM is installed.
+      $contact_data['contact_type'] = $contact_type;
+      $contact = civicrm_api3('Contact', 'getorcreate', $contact_data);
+      $contact_id = (!empty($contact['id']) ? $contact['id'] : NULL);
+    }
+    else {
+      // XCM is not installed. Try to find the contact with Contact.getsingle.
+      try {
+        $contact = civicrm_api3('Contact', 'getsingle', $contact_data);
+        $contact_id = $contact['id'];
+      }
+      catch (CiviCRM_API3_Exception $exception) {
+        // Contact could not be found, create it.
+        $contact = civicrm_api3('Contact', 'create', $contact_data);
+        $contact_id = $contact['id'];
+      }
     }
 
-    return $contact['id'];
+    return $contact_id;
   }
 
   public static function getGroupIdByName($group_name) {

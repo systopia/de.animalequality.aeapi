@@ -30,7 +30,7 @@ function _civicrm_api3_a_e_contact_Submit_spec(&$spec) {
     'title' => E::ts('Contact data'),
     'type' => CRM_Utils_Type::T_STRING,
     'api.required' => 1,
-    'description' => E::ts('An array of contact data.'),
+    'description' => E::ts('An array of contact data of which the contact_type key is mandatory.'),
   );
   $spec['groups'] = array(
     'name' => 'groups',
@@ -69,24 +69,7 @@ function civicrm_api3_a_e_contact_Submit($params) {
     }
 
     // Retrieve contact ID for given contact data.
-    $manager = CRM_Extension_System::singleton()->getManager();
-    if ($manager->getStatus('de.systopia.xcm') === CRM_Extension_Manager::STATUS_INSTALLED) {
-      // XCM is installed.
-      $contact_id = CRM_Aeapi_Submission::getContact($params['contact']['contact_type'], $params['contact']);
-    }
-    else {
-      // XCM is not installed. Try to find the contact with Contact.getsingle.
-      try {
-        $contact = civicrm_api3('Contact', 'getsingle', $params['contact']);
-        $contact_id = $contact['id'];
-      }
-      catch (CiviCRM_API3_Exception $exception) {
-        // Contact could not be found, create it.
-        $contact = civicrm_api3('Contact', 'create', $params['contact']);
-        $contact_id = $contact['id'];
-      }
-    }
-
+    $contact_id = CRM_Aeapi_Submission::getContact($params['contact']['contact_type'], $params['contact']);
     // Load contact.
     $contact = civicrm_api3('Contact', 'getsingle', array('id' => $contact_id));
 
