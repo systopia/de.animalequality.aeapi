@@ -80,8 +80,9 @@ function civicrm_api3_a_e_contact_Submit($params) {
     if (!empty($params['groups'])) {
       foreach($params['groups'] as $group_info) {
         list($group_name, $group_status) = explode(':', $group_info) + [NULL, CRM_Aeapi_Submission::GROUP_STATUS_ADDED];
-        /* This group is the main newsletter for the petition. If the contact accepted the reception
-            of a newsletter, we send a Double OptIn by the MailingEventSubscribe event */
+        // This group is the main newsletter for the petition. If the contact
+        // accepted the reception of a newsletter, we send a Double OptIn by the
+        // MailingEventSubscribe event.
         if (strcasecmp($group_status, CRM_Aeapi_Submission::NEWSLETTER_GROUP) === 0) {
           if ($params['want_newsletter']) {
             // Set group-subscription status to pending
@@ -98,8 +99,8 @@ function civicrm_api3_a_e_contact_Submit($params) {
             ));
           }
         }
-        /* Pending groups also need a Double-OptIn, but it doesn't depend
-            on accepting the newsletter */
+        // Pending groups also need a Double-OptIn, but it doesn't depend on
+        // accepting the newsletter.
         elseif (strcasecmp($group_status, CRM_Aeapi_Submission::GROUP_STATUS_PENDING) === 0) {
           $mailing_event_subscribe = civicrm_api3('MailingEventSubscribe', 'create', array(
             'contact_id' => $contact_id,
@@ -113,8 +114,8 @@ function civicrm_api3_a_e_contact_Submit($params) {
             'status_id' => 'Completed'
           ));
         }
-        /* For some Welcome Journeys, we only want new contacts to join
-            and only in case they just accepted the newsletter */
+        // For some Welcome Journeys, we only want new contacts to join and only
+        // in case they just accepted the newsletter.
         elseif (strcasecmp($group_status, CRM_Aeapi_Submission::DOI_NEW_GROUP) === 0) {
           if ($params['want_newsletter'] && $contact_is_new) {
             $group_contact = civicrm_api3('GroupContact', 'create', array(
@@ -124,7 +125,8 @@ function civicrm_api3_a_e_contact_Submit($params) {
             ));
           }
         }
-        /* All other groups (including the status "Added") will just get added to the contact */
+        // All other groups (including the status "Added") will just get added
+        // to the contact.
         else {
           $group_contact = civicrm_api3('GroupContact', 'create', array(
             'contact_id' => $contact_id,
