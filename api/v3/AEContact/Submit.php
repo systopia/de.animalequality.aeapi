@@ -69,7 +69,7 @@ function civicrm_api3_a_e_contact_Submit($params) {
     }
 
     // Check if contact ID already exists
-    $contact_is_new = CRM_Aeapi_Submission::isNew($params['contact']['contact_type'], $params['contact']);
+    $contact_is_new = CRM_Aeapi_Submission::isNew($params['contact']);
 
     // Retrieve contact ID for given contact data.
     $contact_id = CRM_Aeapi_Submission::getContact($params['contact']['contact_type'], $params['contact']);

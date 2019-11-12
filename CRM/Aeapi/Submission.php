@@ -105,16 +105,32 @@ class CRM_Aeapi_Submission {
     return $group['id'];
   }
 
-  // Check if contact already exists
-  public static function isNew($contact_type, $contact_data) {
-    $contact_data['contact_type'] = $contact_type;
-    try {
-      civicrm_api3('Contact', 'getsingle', $contact_data);
-      return TRUE;
+  /**
+   * Check if contact already exists
+   *
+   * @param $contact_type
+   * @param $contact_data
+   *
+   * @return bool
+   */
+  public static function isNew($contact_data) {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    if ($manager->getStatus('de.systopia.xcm') === CRM_Extension_Manager::STATUS_INSTALLED) {
+      $profile = CRM_Utils_Array::value('xcm_profile', $contact_data, NULL);
+      $engine = CRM_Xcm_MatchingEngine::getEngine($profile);
+      $contact = $engine->matchContact($contact_data);
+      return empty($contact['contact_id']);
     }
-    catch (CiviCRM_API3_Exception $exception) {
-      return FALSE;
+    else {
+      try {
+        civicrm_api3('Contact', 'getsingle', $contact_data);
+        return FALSE;
+      }
+      catch (CiviCRM_API3_Exception $exception) {
+        return TRUE;
+      }
     }
+
   }
   
 }
