@@ -68,6 +68,9 @@ function civicrm_api3_a_e_contact_Submit($params) {
       }
     }
 
+    // Check if contact ID already exists
+    $contact_is_new = CRM_Aeapi_Submission::isNew($params['contact']['contact_type'], $params['contact']);
+
     // Retrieve contact ID for given contact data.
     $contact_id = CRM_Aeapi_Submission::getContact($params['contact']['contact_type'], $params['contact']);
     // Load contact.
@@ -107,7 +110,17 @@ function civicrm_api3_a_e_contact_Submit($params) {
             'subject' => 'Requested: '.$group_name.' (DoubleOptIn sent)',
             'status_id' => 'Completed'
           ));
-        } else {
+        }
+        if (strcasecmp($group_status, CRM_Aeapi_Submission::DOI_NEW_GROUP) === 0) {
+          if ($params['want_newsletter'] && $contact_is_new) {
+            $group_contact = civicrm_api3('GroupContact', 'create', array(
+              'contact_id' => $contact_id,
+              'group_id' => CRM_Aeapi_Submission::getGroupIdByName($group_name),
+              'status' => 'Added'
+            ));
+          }
+        }
+        else {
           $group_contact = civicrm_api3('GroupContact', 'create', array(
             'contact_id' => $contact_id,
             'group_id' => CRM_Aeapi_Submission::getGroupIdByName($group_name),
