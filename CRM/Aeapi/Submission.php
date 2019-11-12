@@ -108,16 +108,12 @@ class CRM_Aeapi_Submission {
   // Check if contact already exists
   public static function isNew($contact_type, $contact_data) {
     $contact_data['contact_type'] = $contact_type;
-    $contact = civicrm_api3('Contact', 'get', $contact_data);
     try {
-      if(!empty($contact['id'])) {
-        return false;
-      } else {
-        return true;
-      }
+      civicrm_api3('Contact', 'getsingle', $contact_data);
+      return TRUE;
     }
     catch (CiviCRM_API3_Exception $exception) {
-      return true;
+      return FALSE;
     }
   }
   
