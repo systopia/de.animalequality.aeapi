@@ -97,7 +97,6 @@ function civicrm_api3_a_e_contact_Submit($params) {
               'status_id' => 'Completed'
             ));
           }
-          continue;
         }
         /* Pending groups also need a Double-OptIn, but it doesn't depend
             on accepting the newsletter */
@@ -113,7 +112,6 @@ function civicrm_api3_a_e_contact_Submit($params) {
             'subject' => 'Requested: '.$group_name.' (DoubleOptIn sent)',
             'status_id' => 'Completed'
           ));
-          continue;
         }
         /* For some Welcome Journeys, we only want new contacts to join
             and only in case they just accepted the newsletter */
@@ -125,7 +123,6 @@ function civicrm_api3_a_e_contact_Submit($params) {
               'status' => 'Added'
             ));
           }
-          continue;
         }
         /* All other groups (including the status "Added") will just get added to the contact */
         else {
