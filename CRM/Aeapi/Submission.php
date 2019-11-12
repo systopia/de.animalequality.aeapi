@@ -78,7 +78,6 @@ class CRM_Aeapi_Submission {
     if ($manager->getStatus('de.systopia.xcm') === CRM_Extension_Manager::STATUS_INSTALLED) {
       // XCM is installed.
       $contact_data['contact_type'] = $contact_type;
-
       $contact = civicrm_api3('Contact', 'getorcreate', $contact_data);
       $contact_id = (!empty($contact['id']) ? $contact['id'] : NULL);
     }
@@ -121,7 +120,5 @@ class CRM_Aeapi_Submission {
       return true;
     }
   }
-
-
-
+  
 }
