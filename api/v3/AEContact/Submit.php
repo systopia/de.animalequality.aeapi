@@ -139,10 +139,10 @@ function civicrm_api3_a_e_contact_Submit($params) {
 
     return civicrm_api3_create_success(
       array(
-        'Contact' => $contact,
-        'MailingEventSubscribe' => isset($mailing_event_subscribe) ? $mailing_event_subscribe : NULL,
-        'Activity' => isset($activity) ? $activity : NULL,
-        'GroupContact' => isset($group_contact) ? $group_contact : NULL,
+        'Contact' => ['id' => $contact['id']],
+        'MailingEventSubscribe' => isset($mailing_event_subscribe['id']) ? ['id' => $mailing_event_subscribe['id']] : NULL,
+        'Activity' => isset($activity['id']) ? ['id' => $activity['id']] : NULL,
+        'GroupContact' => isset($group_contact['id']) ? ['id' => $group_contact['id']] : NULL,
       ),
       $params
     );
