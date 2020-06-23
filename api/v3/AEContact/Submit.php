@@ -59,11 +59,11 @@ function _civicrm_api3_a_e_contact_Submit_spec(&$spec) {
 function civicrm_api3_a_e_contact_Submit($params) {
   try {
     // Parse JSON from "contact" and "groups" parameters.
-    if (($params['contact'] = json_decode($params['contact'], JSON_OBJECT_AS_ARRAY)) === NULL) {
+    if (!is_array($params['contact']) && ($params['contact'] = json_decode($params['contact'], JSON_OBJECT_AS_ARRAY)) === NULL) {
       throw new Exception(E::ts('Could not parse parameter "contact".'));
     }
     if (!empty($params['groups'])) {
-      if (($params['groups'] = json_decode($params['groups'], JSON_OBJECT_AS_ARRAY)) === NULL) {
+      if (!is_array($params['groups']) && ($params['groups'] = json_decode($params['groups'], JSON_OBJECT_AS_ARRAY)) === NULL) {
         throw new Exception(E::ts('Could not parse parameter "groups".'));
       }
     }
