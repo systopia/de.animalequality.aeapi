@@ -78,7 +78,14 @@ function civicrm_api3_a_e_contact_Submit($params) {
 
     // Add to group with given status.
     if (!empty($params['groups'])) {
-      foreach($params['groups'] as $group_info) {
+      $contactGroups = civicrm_api3('GroupContact', 'get', [
+        'sequential' => 1,
+        'contact_id' => $contact_id,
+        'status' => 'Added',
+        'options' => ['limit' => 0],
+      ]);
+
+      foreach ($params['groups'] as $group_info) {
         list($group_name, $group_status) = explode(':', $group_info) + [NULL, CRM_Aeapi_Submission::GROUP_STATUS_ADDED];
         // This group is the main newsletter for the petition. If the contact
         // accepted the reception of a newsletter, we send a Double OptIn by the
@@ -102,17 +109,23 @@ function civicrm_api3_a_e_contact_Submit($params) {
         // Pending groups also need a Double-OptIn, but it doesn't depend on
         // accepting the newsletter.
         elseif (strcasecmp($group_status, CRM_Aeapi_Submission::GROUP_STATUS_PENDING) === 0) {
-          $mailing_event_subscribe = civicrm_api3('MailingEventSubscribe', 'create', array(
-            'contact_id' => $contact_id,
-            'email' => $contact['email'],
-            'group_id' => CRM_Aeapi_Submission::getGroupIdByName($group_name),
-          ));
-          $activity = civicrm_api3('Activity', 'create', array(
-            'source_contact_id' => $contact_id,
-            'activity_type_id' => 'Mailinglist Event',
-            'subject' => 'Requested: '.$group_name.' (DoubleOptIn sent)',
-            'status_id' => 'Completed'
-          ));
+          $groupId = CRM_Aeapi_Submission::getGroupIdByName($group_name);
+
+          // Only trigger the subscribe event if the contact is not already in the group
+          if (!in_array($groupId, array_column($contactGroups['values'], 'group_id'))) {
+            $mailing_event_subscribe = civicrm_api3('MailingEventSubscribe', 'create', array(
+              'contact_id' => $contact_id,
+              'email' => $contact['email'],
+              'group_id' => $groupId,
+            ));
+
+            $activity = civicrm_api3('Activity', 'create', array(
+              'source_contact_id' => $contact_id,
+              'activity_type_id' => 'Mailinglist Event',
+              'subject' => 'Requested: ' . $group_name . ' (DoubleOptIn sent)',
+              'status_id' => 'Completed'
+            ));
+          }
         }
         // For some Welcome Journeys, we only want new contacts to join and only
         // in case they just accepted the newsletter.
